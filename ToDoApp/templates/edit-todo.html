@@ -1,0 +1,142 @@
+{% include "layout.html" %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Let's edit your todo!
+        </div>
+        <div class="card-body">
+
+            <form id="editTodoForm">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text"
+                           class="form-control"
+                           id="title"
+                           value="{{todo.title}}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea
+                            id="description"
+                            class="form-control"
+                            rows="3"
+                            required>{{todo.description}}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="priority" class="form-control">
+                        <option value="1" {% if todo.priority== 1 %}selected{% endif %}>1</option>
+                        <option value="2" {% if todo.priority== 2 %}selected{% endif %}>2</option>
+                        <option value="3" {% if todo.priority== 3 %}selected{% endif %}>3</option>
+                        <option value="4" {% if todo.priority== 4 %}selected{% endif %}>4</option>
+                        <option value="5" {% if todo.priority== 5 %}selected{% endif %}>5</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-check">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           id="complete"
+                           {% if todo.complete %}checked{% endif %}>
+                    <label class="form-check-label">
+                        Complete
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Edit your todo
+                </button>
+
+                <button id="deleteButton"
+                        type="button"
+                        class="btn btn-danger">
+                    Delete
+                </button>
+
+                <a href="/todos/todo-page"
+                   class="btn btn-success">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const todoId = "{{todo.id}}";
+
+    const form = document.getElementById("editTodoForm");
+
+    form.onsubmit = async function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const todoData = {
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            priority: Number(document.getElementById("priority").value),
+            complete: document.getElementById("complete").checked
+        };
+
+        try {
+
+            const response = await fetch(`/todos/todo/${todoId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(todoData)
+            });
+
+            if (response.ok) {
+                alert("Todo updated successfully!");
+                window.location.href = "/todos/todo-page";
+            } else {
+                const error = await response.text();
+                console.log(error);
+                alert("Failed to update todo");
+            }
+
+        } catch (err) {
+            console.log(err);
+            alert("An error occurred. Please try again.");
+        }
+
+        return false;
+    };
+
+    document.getElementById("deleteButton").onclick = async function () {
+
+        if (!confirm("Are you sure?")) return;
+
+        try {
+
+            const response = await fetch(`/todos/todo/${todoId}`, {
+                method: "DELETE"
+            });
+
+            if (response.ok) {
+                alert("Todo deleted successfully!");
+                window.location.href = "/todos/todo-page";
+            } else {
+                alert("Failed to delete");
+            }
+
+        } catch (err) {
+            console.log(err);
+            alert("An error occurred. Please try again.");
+        }
+
+    };
+
+</script>

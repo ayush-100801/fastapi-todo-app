@@ -1,0 +1,7 @@
+.fastapienv/
+.venv/
+__pycache__/
+*.pyc
+.env
+.idea/
+.pytest_cache/
